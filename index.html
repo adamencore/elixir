@@ -68,7 +68,27 @@ h1,h2,h3,p{margin:0}
 .nav{display:flex;align-items:center;gap:clamp(18px,2.6vw,40px);font-weight:500;font-size:.95rem}
 .nav a:not(.btn){text-decoration:none;background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .3s;padding-block:4px}
 .nav a:not(.btn):hover,.nav a[aria-current="page"]{background-size:100% 1px}
-@media (max-width:520px){.nav a[data-view="work"]{display:none}}
+/* mobile menu */
+.menu-btn{display:none;place-items:center;width:48px;height:48px;padding:0;border-radius:12px;border:1.5px solid var(--teal);background:transparent;color:var(--teal);cursor:pointer;transition:background .25s,color .25s}
+.menu-btn:hover{background:var(--teal);color:var(--mist)}
+.menu-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+@media (max-width:720px){.nav{display:none}.menu-btn{display:grid}}
+.mnav{position:fixed;inset:0;z-index:100;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:24px;overflow:hidden;background:var(--teal);color:var(--mist);
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 44px);opacity:0;transition:opacity .35s ease}
+.mnav.open{opacity:1}
+.mnav .lines{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--sage);stroke-width:1;opacity:.4;pointer-events:none}
+.mnav-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 10px 10px 20px;border-radius:18px;background:rgba(236,240,240,.07)}
+.mnav-bar .logo{width:112px;color:var(--logo)}
+.mnav .menu-btn{display:grid;border-color:var(--lav);color:var(--mist)}
+.mnav .menu-btn:hover{background:var(--lav);color:var(--teal)}
+.mnav ul{position:relative;list-style:none;margin:0;padding:0;display:grid;align-content:center;justify-items:center;gap:4px;text-align:center}
+.mnav ul a{display:inline-block;font-synthesis:none;font:300 clamp(2.6rem,12vw,4.2rem)/1.14 var(--display);letter-spacing:-.03em;color:var(--mist);text-decoration:none}
+.mnav ul a:hover,.mnav ul a[aria-current="page"]{color:var(--lav)}
+.mnav .mail{position:relative;justify-self:center;font-synthesis:none;font:300 clamp(1.1rem,5vw,1.4rem)/1 var(--display);color:var(--mist);text-decoration:none;padding-bottom:7px;border-bottom:1.5px solid var(--lav)}
+.mnav li,.mnav .mail{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.mnav.open li,.mnav.open .mail{opacity:1;transform:none}
+.mnav.open li:nth-child(2){transition-delay:.05s}.mnav.open li:nth-child(3){transition-delay:.1s}.mnav.open li:nth-child(4){transition-delay:.15s}.mnav.open .mail{transition-delay:.22s}
+@media (prefers-reduced-motion:reduce){.mnav,.mnav li,.mnav .mail{transition:none}}
 
 /* hero */
 .hero{padding-block:clamp(40px,7vw,112px) 0;text-align:center}
@@ -280,6 +300,28 @@ h1,h2,h3,p{margin:0}
   </symbol>
 </svg>
 
+<div class="mnav" id="mnav" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <svg class="lines" viewBox="0 0 400 860" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path d="M-40 120C80 60 120 200 60 300S-20 520 120 560 300 520 330 640 260 860 420 900"/>
+    <path d="M460 40C330 90 300 220 380 320S470 520 330 600 120 650 90 760-10 900 -60 940"/>
+    <path d="M-60 430C60 380 190 420 230 520S300 700 460 690"/>
+    <path d="M120 -40C150 80 260 120 330 90S470 60 470 160"/>
+  </svg>
+  <div class="mnav-bar">
+    <a class="logo" href="#home" aria-label="Elixir, home"><svg viewBox="0 0 384.81 83.82" aria-hidden="true"><use href="#elixir"/></svg></a>
+    <button class="menu-btn" id="menu-close" type="button" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <ul>
+    <li><a href="#work" data-view="work">Our Work</a></li>
+    <li><a href="#about" data-view="about">About</a></li>
+    <li><a href="#process">Our Process</a></li>
+    <li><a href="mailto:hello@your-elixir-domain.com?subject=Let%E2%80%99s%20connect">Connect</a></li>
+  </ul>
+  <a class="mail" href="mailto:hello@your-elixir-domain.com?subject=Let%E2%80%99s%20connect">hello@your-elixir-domain.com</a>
+</div>
+
 <div class="lav-ground">
 <div class="page">
 
@@ -290,6 +332,9 @@ h1,h2,h3,p{margin:0}
       <a href="#about" data-view="about">About</a>
       <a class="btn btn--nav" href="mailto:hello@your-elixir-domain.com?subject=Let%E2%80%99s%20connect">Connect</a>
     </nav>
+    <button class="menu-btn" id="menu-open" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h18M3 15h18"/></svg>
+    </button>
   </header>
 
   <main id="home">
@@ -663,6 +708,20 @@ function renderSpot(slug){
     if (visible && ready && !raf) raf = requestAnimationFrame(loop);
   }).observe(cv);
   img.complete && img.naturalWidth ? start() : img.addEventListener('load', start, { once: true });
+})();
+
+/* Mobile menu: full-screen overlay */
+(function mobileMenu(){
+  const nav = document.getElementById('mnav'), openBtn = document.getElementById('menu-open'), closeBtn = document.getElementById('menu-close');
+  function open(){ nav.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => nav.classList.add('open')));
+    openBtn.setAttribute('aria-expanded', 'true'); document.documentElement.style.overflow = 'hidden'; closeBtn.focus(); }
+  function shut(returnFocus){ nav.classList.remove('open'); nav.hidden = true;
+    openBtn.setAttribute('aria-expanded', 'false'); document.documentElement.style.overflow = ''; if (returnFocus) openBtn.focus(); }
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', () => shut(true));
+  nav.addEventListener('click', e => { if (e.target.closest('a')) shut(false); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !nav.hidden) shut(true); });
+  matchMedia('(min-width: 721px)').addEventListener('change', e => { if (e.matches && !nav.hidden) shut(false); });
 })();
 
 /* Tilted cards drift a little against the scroll */
