@@ -224,13 +224,21 @@ h1,h2,h3,p{margin:0}
   .member .pic,.member.flip .pic{grid-column:1;grid-row:2;width:min(100%,420px);justify-self:center}
 }
 
-/* ============ OUR WORK: COMING SOON ============ */
-.soon{padding-block:clamp(56px,9vw,150px) var(--section);display:grid;justify-items:center;text-align:center;gap:clamp(20px,2.6vw,36px)}
-.soon-mark{width:clamp(56px,7vw,96px);height:auto;fill:var(--lav);animation:spin 16s linear infinite}
-.soon h1{font-synthesis:none;font:300 clamp(3.2rem,11vw,11rem)/.95 var(--display);letter-spacing:-.035em}
-.soon p{max-width:44ch;text-wrap:balance;font-size:clamp(1.0625rem,1.4vw,1.3rem)}
-.soon-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* ============ OUR WORK: PROJECT INDEX ============ */
+.work-page{padding-block:clamp(40px,7vw,112px) var(--section)}
+.work-head{display:grid;gap:clamp(16px,2vw,28px);margin-bottom:clamp(48px,7vw,112px)}
+.work-head h1{font-synthesis:none;font:300 clamp(2.8rem,8vw,8rem)/.95 var(--display);letter-spacing:-.035em;max-width:14ch;text-wrap:balance}
+.work-head p{max-width:46ch;font-size:clamp(1.0625rem,1.4vw,1.3rem)}
+.work-all{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(48px,6vw,96px) clamp(16px,3vw,48px)}
+.work-all .tile:nth-child(n){grid-column:auto;margin-top:0}
+.work-all .tile:nth-child(even){margin-top:clamp(0px,8vw,140px)}
+.work-all .tile.tile:last-child:nth-child(odd){grid-column:1/-1;margin-top:0}
+.work-all .meta{font:300 .8125rem/1.5 var(--mono);letter-spacing:.06em;color:var(--sage)}
+.work-all .tile h3{font-synthesis:none;font:300 clamp(1.6rem,2.6vw,2.4rem)/1.05 var(--display);letter-spacing:-.02em}
+.work-all .go{display:inline-flex;align-items:center;gap:.5em;font:500 .75rem/1 var(--body);letter-spacing:.18em;text-transform:uppercase;margin-top:6px}
+.work-all .go span{transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.work-all .tile:hover .go span{transform:translateX(.35em)}
+@media (max-width:720px){.work-all{grid-template-columns:minmax(0,1fr)}.work-all .tile:nth-child(even){margin-top:0}}
 
 /* ============ PROJECT SPOTLIGHT (#las-vegas-rescue-mission etc.) ============ */
 .spot{padding-block:clamp(28px,4vw,64px) var(--section)}
@@ -279,7 +287,6 @@ h1,h2,h3,p{margin:0}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .card{transform:rotate(var(--r,0deg))}
-  .soon-mark{animation:none}
   *{transition-duration:.01ms!important}
 }
 </style>
@@ -392,17 +399,15 @@ h1,h2,h3,p{margin:0}
   <!-- PROJECT SPOTLIGHT VIEW: filled from SPOTLIGHTS when the address ends in a project's slug -->
   <main id="project" hidden></main>
 
-  <!-- OUR WORK VIEW: shown when the address ends in #work -->
+  <!-- OUR WORK VIEW: index of every project, shown when the address ends in #work -->
   <main id="work" hidden>
-    <section class="wrap soon">
-      <svg class="soon-mark" viewBox="0 0 36 36" aria-hidden="true"><use href="#star"/></svg>
-      <span class="eyebrow">Our Work</span>
-      <h1>Coming soon.</h1>
-      <p>We’re putting together the full collection of our work. Check back soon, or reach out and we’ll walk you through it.</p>
-      <div class="soon-actions">
-        <a class="btn" href="mailto:hello@your-elixir-domain.com?subject=Let%E2%80%99s%20connect">Connect</a>
-        <a class="btn btn--ghost" href="#home">Back to home</a>
-      </div>
+    <section class="wrap work-page">
+      <header class="work-head">
+        <span class="eyebrow"><svg viewBox="0 0 36 36" aria-hidden="true"><use href="#star"/></svg>Our Work</span>
+        <h1>Stories we’ve helped tell.</h1>
+        <p>A few of the brands, communities and organizations we’ve partnered with, and the stories behind the work.</p>
+      </header>
+      <div class="work-all" id="work-all"></div>
     </section>
   </main>
 
@@ -592,6 +597,23 @@ const SPOTLIGHTS = {
     </a>`).join('');
 })();
 
+/* Our Work page: every project, linking to its spotlight */
+(function workIndex(){
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  document.getElementById('work-all').innerHTML = PROJECTS.map(p => { const s = SPOTLIGHTS[p.slug] || {};
+    return `<a class="tile" href="#${esc(p.slug)}">
+      <div class="shot" data-tone="${esc(p.tone || 'mist')}" style="aspect-ratio:5 / 3">
+        <img src="${esc(p.image)}" alt="${esc(p.alt || p.title)}" style="object-position:${esc(p.pos || '50% 50%')}">
+      </div>
+      <div class="cap">
+        <span class="meta">${esc(s.location || '')}</span>
+        <h3>${esc(p.title)}</h3>
+        <p>${esc(s.lead || '')}</p>
+        <span class="go">View project <span aria-hidden="true">&rarr;</span></span>
+      </div>
+    </a>`; }).join('');
+})();
+
 /* Project spotlight pages, drawn from PROJECTS + SPOTLIGHTS */
 function renderSpot(slug){
   const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -608,7 +630,7 @@ function renderSpot(slug){
     (j === 1 ? `<div class="ph-row two">${slot(0)}${slot(1)}</div>` : j === 3 ? `<div class="ph-row wide">${slot(2)}</div>` : '')).join('');
   document.getElementById('project').innerHTML = `
     <article class="wrap spot">
-      <a class="back" href="#featured"><span aria-hidden="true">&larr;</span> All work</a>
+      <a class="back" href="#work"><span aria-hidden="true">&larr;</span> All work</a>
       <header class="spot-head">
         <h1>${esc(p.title)}</h1>
         <p class="lead">${esc(s.lead)}</p>
