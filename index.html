@@ -451,15 +451,17 @@ const PROJECTS = [
 /* ---------------------------------------------------------------
    PROJECT SPOTLIGHTS: one entry per project, keyed by its page address
    (elixirstories.com/#las-vegas-rescue-mission and so on).
-   photos: up to three images for the page. Leave a slot empty ("")
-   and it shows a brand color placeholder with the Elixir star.
+   hero: optional top image for this page (otherwise the homepage cover is used).
+   photos: three spots, in page order: tall, tall, wide. Each is a file path,
+   or [path, "x% y%"] to choose which part shows when it is cropped.
+   Leave a spot empty ("") and it shows a brand color placeholder.
 ---------------------------------------------------------------- */
 const SPOTLIGHTS = {
   "las-vegas-rescue-mission": {
     lead: "A fifty-year story of hope, told with fresh clarity.",
     location: "Las Vegas, Nevada",
     services: ["Brand refresh", "Website", "Campaigns"],
-    photos: ["", "", ""],
+    photos: [["images/lvrm-1.jpg", "64% 40%"], "", ""],
     blocks: [
       ["The client", "Las Vegas Rescue Mission has served people in need since 1970, when six local businessmen opened it in a small downtown storefront. Today the Mission spans two city blocks and serves around 30,000 meals a month, offering shelter, recovery programs and a path forward for people rebuilding their lives."],
       ["The challenge", "The Mission’s impact had grown far beyond its brand. Its website and visuals no longer reflected the depth of its work or the people behind it, and the story was getting lost. It was time to reshape how the Mission introduces itself to donors, volunteers and the community it serves."],
@@ -485,7 +487,8 @@ const SPOTLIGHTS = {
     lead: "Telling the story of a place before it exists.",
     location: "Toquerville, Utah",
     services: ["Brand management", "Storytelling"],
-    photos: ["", "", ""],
+    hero: ["images/firelight-hero.jpg", "50% 50%"],
+    photos: ["images/firelight-1.jpg", "images/firelight-2.jpg", ["images/firelight-3.jpg", "50% 88%"]],
     blocks: [
       ["The client", "Firelight is a new, large-scale community in Toquerville, Utah, from the same owners as SunRiver. Unlike SunRiver’s 55-and-older focus, Firelight is designed for every age and stage of life, with a much bigger footprint and a much wider reach."],
       ["The challenge", "Firelight’s story had to be told while the community was still in pre-construction. There were no streets to walk or homes to tour yet, so the brand had to help people picture the life they could have there, and believe in it."],
@@ -498,7 +501,8 @@ const SPOTLIGHTS = {
     lead: "Meeting families at their hardest moment with warmth and clarity.",
     location: "Hurricane, Utah",
     services: ["Brand refresh", "Website", "Video storytelling"],
-    photos: ["", "", ""],
+    hero: ["images/liahona-hero.jpg", "50% 42%"],
+    photos: ["images/liahona-1.jpg", "images/liahona-2.jpg", ["images/liahona-3.jpg", "50% 58%"]],
     blocks: [
       ["The client", "Since 2001, Liahona Academy has worked with families of teenage boys aged 13 to 17 through residential treatment in Hurricane, Utah. Therapy, academics and outdoor recreation all come together in one structured program. For many families, Liahona comes into their lives at the hardest moment they have faced."],
       ["The challenge", "Parents searching for help are often scared, overwhelmed and unsure who to trust. Liahona’s brand and website needed to meet them there, with warmth and clarity instead of clinical distance, and to show the real care behind the program."],
@@ -547,8 +551,9 @@ function renderSpot(slug){
   const nx = PROJECTS[(i + 1) % PROJECTS.length];
   const star = '<svg viewBox="0 0 36 36" aria-hidden="true"><use href="#star"/></svg>';
   const tones = ['lav','teal','sage'];
-  const slot = k => { const src = (s.photos || [])[k];
-    return src ? `<div class="slot"><img src="${esc(src)}" alt=""></div>`
+  const pick = v => Array.isArray(v) ? v : [v, '50% 50%'];
+  const slot = k => { const [src, pos] = pick((s.photos || [])[k] || '');
+    return src ? `<div class="slot"><img src="${esc(src)}" alt="" style="object-position:${esc(pos)}"></div>`
                : `<div class="slot" data-tone="${tones[k % 3]}" aria-hidden="true">${star}</div>`; };
   const blocks = s.blocks.map(([h, t], j) =>
     `<section class="blk"><h2>${star}${esc(h)}</h2><p>${esc(t)}</p></section>` +
@@ -565,7 +570,8 @@ function renderSpot(slug){
         <div><dt>Location</dt><dd>${esc(s.location)}</dd></div>
         <div><dt>What we did</dt><dd>${s.services.map(esc).join(', ')}</dd></div>
       </dl>
-      <figure class="spot-hero"><img src="${esc(p.image)}" alt="${esc(p.alt || p.title)}" style="object-position:${esc(p.pos || '50% 50%')}"></figure>
+      <figure class="spot-hero">${(() => { const [hs, hp] = s.hero ? pick(s.hero) : [p.image, p.pos || '50% 50%'];
+        return `<img src="${esc(hs)}" alt="${s.hero ? '' : esc(p.alt || p.title)}" style="object-position:${esc(hp)}">`; })()}</figure>
       <div class="blocks">${blocks}</div>
       <nav class="next" aria-label="Next project">
         <span class="eyebrow">${star}Next project</span>
